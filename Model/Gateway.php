@@ -155,7 +155,7 @@ class Cammino_Clearsale_Model_Gateway {
 		$str = "";
 
 		foreach($data as $key => $value) {
-			$str .= $key . "=" . utf8_decode($value) . "&";
+			$str .= $key . "=" . $value . "&";
 		}
 
 		return $str;
