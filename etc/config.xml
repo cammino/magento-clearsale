@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Cammino_Clearsale>
+            <version>0.1.0</version>
+        </Cammino_Clearsale>
+    </modules>
+    <global>
+        <models>
+            <cammino_clearsale>
+                <class>Cammino_Clearsale_Model</class>
+            </cammino_clearsale>
+        </models>
+        <blocks>
+            <adminhtml>
+                <rewrite>
+                    <sales_order_view_tab_info>Cammino_Clearsale_Block_Adminhtml_Sales_Order_View_Tab_Info</sales_order_view_tab_info>
+                </rewrite>
+            </adminhtml>
+        </blocks>
+    </global>
+    <default>
+        <payment_services>
+            <clearsale>
+                <active>0</active>
+            </clearsale>
+        </payment_services>
+    </default>
+</config>

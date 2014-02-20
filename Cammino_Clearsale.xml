@@ -1,0 +1,8 @@
+<config>
+    <modules>
+        <Cammino_Clearsale>
+            <active>true</active>
+            <codePool>community</codePool>
+        </Cammino_Clearsale>
+    </modules>
+</config>
