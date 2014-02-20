@@ -1,0 +1,7 @@
+INSTALL (for git)
+
+mkdir app/code/community/Cammino
+git submodule add git@github.com:mferracioli/magento-clearsale.git app/code/community/Cammino/Clearsale
+cp app/code/community/Cammino/Clearsale/Cammino_Sps.xml app/etc/modules/
+
+TODO
