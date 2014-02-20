@@ -23,6 +23,10 @@ class Cammino_Clearsale_Model_Gateway {
 
 			$paymentType = 0;
 
+			if ($payment->getMethodInstance()->getCode() == "cielo_default") {
+				$paymentType = 1;
+			}
+
 			if ($payment->getMethodInstance()->getCode() == "sps_boleto") {
 				$paymentType = 2;
 			}
@@ -103,11 +107,11 @@ class Cammino_Clearsale_Model_Gateway {
 		$payment = $order->getPayment();
 		$addata = unserialize($payment->getData("additional_data"));
 
-		// if ($addata["clearsale"] != "exported") {
+		if ($addata["clearsale"] != "exported") {
 			$this->exportOrder($order);
 			$addata["clearsale"] = "exported";
 			$payment->setAdditionalData(serialize($addata))->save();
-		// }
+		}
 
 		$url = $this->getBaseUrl() . "?codigoIntegracao=". Mage::getStoreConfig("payment_services/clearsale/key") ."&PedidoID=" . $order->getRealOrderId();
 
