@@ -84,7 +84,7 @@ class Cammino_Clearsale_Model_Gateway {
 				"Total" => number_format(floatval($order->getGrandTotal()), 2, ".", ""),
 
 				"TipoPagamento" => $paymentType,
-			//	"TipoCartao" => "",
+				"TipoCartao" => $creditcardBrand,
 			//	"Cartao_Bin" => "",
 			//	"Cartao_Fim" => "",
 			//	"Cartao_Numero_Mascarado" => "",
@@ -147,11 +147,11 @@ class Cammino_Clearsale_Model_Gateway {
 		$payment = $order->getPayment();
 		$addata = unserialize($payment->getData("additional_data"));
 
-		//if ($addata["clearsale"] != "exported") {
+		if ($addata["clearsale"] != "exported") {
 			$this->exportOrder($order);
 			$addata["clearsale"] = "exported";
 			$payment->setAdditionalData(serialize($addata))->save();
-		//}
+		}
 
 		$url = $this->getBaseUrl() . "?codigoIntegracao=". Mage::getStoreConfig("payment_services/clearsale/key") ."&PedidoID=" . $order->getRealOrderId();
 
