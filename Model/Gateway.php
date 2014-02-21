@@ -37,12 +37,39 @@ class Cammino_Clearsale_Model_Gateway {
 			$shippingPhone = preg_replace('/[^0-9]/', '', $shippingAddress->getTelephone());
 
 			$paymentType = 0;
+			$creditcardBrand = 0;
 
-			if ($payment->getMethodInstance()->getCode() == "cielo_default") {
+			$creditcardMethods = explode(",", Mage::getStoreConfig("payment_services/clearsale/credicardmethod"));
+			$boletoMethods = explode(",", Mage::getStoreConfig("payment_services/clearsale/boletomethod"));
+
+			if (in_array($payment->getMethodInstance()->getCode(), $creditcardMethods)) {
 				$paymentType = 1;
+				$creditcardBrand = 4;
+				$paymentData = $payment->getData("additional_data");
+
+				if (strripos($paymentData, "diners") !== false)
+					$creditcardBrand = 1;
+
+				if (strripos($paymentData, "mastercard") !== false)
+					$creditcardBrand = 2;
+
+				if (strripos($paymentData, "visa") !== false)
+					$creditcardBrand = 3;
+
+				if ((strripos($paymentData, "amex") !== false) || (strripos($paymentData, "american express") !== false))
+					$creditcardBrand = 5;
+
+				if (strripos($paymentData, "hipercard") !== false)
+					$creditcardBrand = 6;
+
+				if (strripos($paymentData, "aura") !== false)
+					$creditcardBrand = 7;
+
+				if (strripos($paymentData, "carrefour") !== false)
+					$creditcardBrand = 8;
 			}
 
-			if ($payment->getMethodInstance()->getCode() == "sps_boleto") {
+			if (in_array($payment->getMethodInstance()->getCode(), $boletoMethods)) {
 				$paymentType = 2;
 			}
 
@@ -108,8 +135,6 @@ class Cammino_Clearsale_Model_Gateway {
 				// $data["Item_Categoria_$itemIndex"] = "";
 			}
 
-			// Mage::log(var_export($data));
-
 			$returnString = $this->postData($data);
 
         } catch (Exception $e) {
@@ -122,11 +147,11 @@ class Cammino_Clearsale_Model_Gateway {
 		$payment = $order->getPayment();
 		$addata = unserialize($payment->getData("additional_data"));
 
-		if ($addata["clearsale"] != "exported") {
+		//if ($addata["clearsale"] != "exported") {
 			$this->exportOrder($order);
 			$addata["clearsale"] = "exported";
 			$payment->setAdditionalData(serialize($addata))->save();
-		}
+		//}
 
 		$url = $this->getBaseUrl() . "?codigoIntegracao=". Mage::getStoreConfig("payment_services/clearsale/key") ."&PedidoID=" . $order->getRealOrderId();
 
