@@ -162,7 +162,7 @@ class Cammino_Clearsale_Model_Gateway {
 		if (Mage::getStoreConfig("payment_services/clearsale/environment") == 'homolog'){
 			$url = 'http://homolog.clearsale.com.br/start/Entrada/EnviarPedido.aspx';
 		} else {
-    		$url = 'https://ecommerce.cbmp.com.br/servicos/ecommwsec.do';
+    		$url = 'http://www.clearsale.com.br/start/Entrada/EnviarPedido.aspx';
 		}
 
     	return $url;
