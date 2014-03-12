@@ -92,7 +92,7 @@ class Cammino_Clearsale_Model_Gateway {
 				"Cobranca_Nome" => $billingName,
 			//	"Cobranca_Nascimento" => "",
 				"Cobranca_Email" => $customer->getEmail(),
-				"Cobranca_Documento" => preg_replace('/[^0-9]/', '', $customer->getTaxvat()),
+				"Cobranca_Documento" => preg_replace('/[^0-9]/', '', $customer->getCpf()),
 				"Cobranca_Logradouro" => $billingAddress->getStreet(1),
 				"Cobranca_Logradouro_Numero" => $billingAddress->getStreet(2),
 				"Cobranca_Logradouro_Complemento" => $billingAddress->getStreet(4),
