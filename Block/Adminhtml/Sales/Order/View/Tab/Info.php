@@ -27,7 +27,7 @@ class Cammino_Clearsale_Block_Adminhtml_Sales_Order_View_Tab_Info extends Mage_A
 			$url = $clearsale->getScoreUrl($order);
 	
 			$exibepagto = parent::getPaymentHtml();
-			$montaclearsale .= "<div style=\"margin-left:-8px;\"><iframe id=\"clearsale\" style=\"width:277px;height:96px;border:none;\" src=\"\"></iframe></div>";
+			$montaclearsale = "<div style=\"margin-left:-8px;\"><iframe id=\"clearsale\" style=\"width:277px;height:96px;border:none;\" src=\"\"></iframe></div>";
 			
 			$botaoantifraude = '<button id="clear_sale_button" title="Verificar Score ClearSale" type="button" class="scalable" onclick="document.getElementById(\'clearsale\').src=\'' . $url . '\';document.getElementById(\'clear_sale_button\').style.display=\'none\'" style=""><span><span><span>ANÁLISE ANTI-FRAUDE CLEARSALE</span></span></span></button>';
 					
