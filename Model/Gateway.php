@@ -133,6 +133,7 @@ class Cammino_Clearsale_Model_Gateway {
 				$data["Item_Qtd_$itemIndex"] = intval($item->getQtyOrdered());
 				$data["Item_Valor_$itemIndex"] = number_format(floatval($item->getPrice()), 2, ".", "");
 				// $data["Item_Categoria_$itemIndex"] = "";
+				$itemIndex++;
 			}
 
 			$returnString = $this->postData($data);
