@@ -21,9 +21,12 @@
     </global>
     <default>
         <payment_services>
-            <clearsale>
+            <clearsale_start>
                 <active>0</active>
-            </clearsale>
+            </clearsale_start>
+            <clearsale_standard>
+                <active>0</active>
+            </clearsale_standard>
         </payment_services>
     </default>
 </config>

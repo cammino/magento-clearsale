@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2014 Cammino Comunicação Online Ltda ME
+Copyright 2015 Cammino Comunicação Online Ltda ME
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-class Cammino_Clearsale_Model_Gateway {
+class Cammino_Clearsale_Model_Start {
 
 	public function exportOrder($order){
 
@@ -39,8 +39,8 @@ class Cammino_Clearsale_Model_Gateway {
 			$paymentType = 0;
 			$creditcardBrand = 0;
 
-			$creditcardMethods = explode(",", Mage::getStoreConfig("payment_services/clearsale/credicardmethod"));
-			$boletoMethods = explode(",", Mage::getStoreConfig("payment_services/clearsale/boletomethod"));
+			$creditcardMethods = explode(",", Mage::getStoreConfig("payment_services/clearsale_start/credicardmethod"));
+			$boletoMethods = explode(",", Mage::getStoreConfig("payment_services/clearsale_start/boletomethod"));
 
 			if (in_array($payment->getMethodInstance()->getCode(), $creditcardMethods)) {
 				$paymentType = 1;
@@ -75,7 +75,7 @@ class Cammino_Clearsale_Model_Gateway {
 
 			$data = array(
 
-				"CodigoIntegracao" => Mage::getStoreConfig("payment_services/clearsale/key"),
+				"CodigoIntegracao" => Mage::getStoreConfig("payment_services/clearsale_start/key"),
 
 				"PedidoID" => $order->getRealOrderId(),
 				"Data" => date('d-m-Y H:i:s', strtotime($order->getCreatedAt())),
@@ -154,13 +154,13 @@ class Cammino_Clearsale_Model_Gateway {
 			$payment->setAdditionalData(serialize($addata))->save();
 		}
 
-		$url = $this->getBaseUrl() . "?codigoIntegracao=". Mage::getStoreConfig("payment_services/clearsale/key") ."&PedidoID=" . $order->getRealOrderId();
+		$url = $this->getBaseUrl() . "?codigoIntegracao=". Mage::getStoreConfig("payment_services/clearsale_start/key") ."&PedidoID=" . $order->getRealOrderId();
 
 		return $url;
 	}
 
 	public function getBaseUrl() {
-		if (Mage::getStoreConfig("payment_services/clearsale/environment") == 'homolog'){
+		if (Mage::getStoreConfig("payment_services/clearsale_start/environment") == 'homolog'){
 			$url = 'http://homolog.clearsale.com.br/start/Entrada/EnviarPedido.aspx';
 		} else {
     		$url = 'http://www.clearsale.com.br/start/Entrada/EnviarPedido.aspx';

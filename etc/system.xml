@@ -2,7 +2,7 @@
 	<sections>
 		<payment_services>
 			<groups>
-				<clearsale translate="label">
+				<clearsale_start translate="label">
 					<label>ClearSale Start</label>
 					<comment><![CDATA[]]></comment>
 					<sort_order>0</sort_order>
@@ -55,7 +55,61 @@
 							<show_in_store>1</show_in_store>
 						</boletomethod>
 					</fields>
-				</clearsale>
+				</clearsale_start>
+				<clearsale_standard translate="label">
+					<label>ClearSale Standard</label>
+					<comment><![CDATA[]]></comment>
+					<sort_order>0</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<active translate="label">
+							<label>Enabled</label>
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>1</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</active>
+						<entity_code translate="label">
+							<label>Entity Code</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>2</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</entity_code>
+						<environment translate="label">
+							<label>Ambiente</label>
+							<frontend_type>radios</frontend_type>
+							<source_model>cammino_clearsale/source_environment</source_model>
+							<sort_order>3</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</environment>
+						<credicardmethod translate="label">
+							<label>Pagamento com Cartão de Crédito</label>
+							<frontend_type>multiselect</frontend_type>
+							<source_model>cammino_clearsale/source_paymentmethod</source_model>
+							<sort_order>4</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</credicardmethod>
+						<boletomethod translate="label">
+							<label>Pagamento com Boleto Bancário</label>
+							<frontend_type>multiselect</frontend_type>
+							<source_model>cammino_clearsale/source_paymentmethod</source_model>
+							<sort_order>5</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</boletomethod>
+					</fields>
+				</clearsale_standard>
 			</groups>
 		</payment_services>
 	</sections>

@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2014 Cammino Comunicação Online Ltda ME
+Copyright 2015 Cammino Comunicação Online Ltda ME
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
