@@ -21,13 +21,18 @@ class Cammino_Clearsale_Model_Standard {
 		$payment = $order->getPayment();
 		$addata = unserialize($payment->getData("additional_data"));
 
-		if ($addata["clearsale"] != "exported") {
-			$this->sendOrder($order);
-			$addata["clearsale"] = "exported";
-			$payment->setAdditionalData(serialize($addata))->save();
-		}
+		// if ($addata["clearsale"] != "exported") {
+		// 	$this->sendOrder($order);
+		// 	$addata["clearsale"] = "exported";
+		// 	$payment->setAdditionalData(serialize($addata))->save();
+		// }
 
-		$xml = $this->getOrderStatusXml($order);
+		$xml = '<?xml version="1.0" encoding="utf-8"?><string xmlns="http://www.clearsale.com.br/integration">&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;ClearSale&gt;&lt;Orders&gt;&lt;Order&gt;&lt;ID&gt;100002620&lt;/ID&gt;&lt;Status&gt;AMA&lt;/Status&gt;&lt;Score&gt;44.8700&lt;/Score&gt;&lt;/Order&gt;&lt;/Orders&gt;&lt;/ClearSale&gt;</string>';
+
+		//$xml = $this->getOrderStatusXml($order);
+		$xmlo = simplexml_load_string($xml);
+		var_dump($xmlo->string);
+
 		// $xml .= $this->getAnalystCommentsXml($order);
 
 		return $xml;
@@ -302,8 +307,8 @@ class Cammino_Clearsale_Model_Standard {
 	    curl_setopt($ch, CURLOPT_URL, $url);
 	    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	    curl_setopt($ch, CURLOPT_FAILONERROR, true);
-	    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-	    curl_setopt($ch, CURLOPT_TIMEOUT, 40);
+	    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
+	    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
 	    
 	    $returnString = curl_exec($ch);
 	    curl_close($ch);
