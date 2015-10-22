@@ -49,27 +49,41 @@ class Cammino_Clearsale_Model_Standard {
 		$disapproveUrl = Mage::helper("adminhtml")->getUrl("/clearsale/disapprove", array('id' => $order->getIncrementId()));
 		$reanalyzeUrl = Mage::helper("adminhtml")->getUrl("/clearsale/reanalyze", array('id' => $order->getIncrementId()));
 
+		$statusColor = "black";
+
+		if (in_array($status, array("APA","APM"))) {
+			$statusColor = "green";
+		} else if (in_array($status, array("AMA","NVO"))) {
+			$statusColor = "black";
+		} else {
+			$statusColor = "red";
+		}
+
 		$html = 	"<table cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; border: 1px solid #d6d6d6; margin: 20px 0;\">
 						<tr>
 							<td colspan=\"2\" style=\"background:#6f8992; color:#fff; font-weight: bold; padding: 2px 10px;\">ClearSale</td>
 						</tr>
 						<tr>
 							<td style=\"padding: 10px 10px 2px 10px; width:15%;\">Status:</td>
-							<td style=\"padding: 10px 10px 2px 10px; font-weight: bold;  width:85%;\">". $this->getLiteralStatus($status) ." (". $status .")</td>
+							<td style=\"padding: 10px 10px 2px 10px; font-weight: bold;  width:85%; color: ".$statusColor.";\">". $this->getLiteralStatus($status) ." (". $status .")</td>
 						</tr>
 						<tr>
 							<td style=\"padding: 2px 10px 10px 10px;\">Score:</td>
 							<td style=\"padding: 2px 10px 10px 10px; font-weight: bold;\">". $statusXmlObj->Orders->Order->Score ."</td>
 						</tr>
 						<tr>
-							<td colspan=\"2\" style=\"padding: 2px 10px 10px 10px; border-bottom: 1px solid #d6d6d6;\">
-								<button type=\"button\" class=\"scalable save\" onclick=\"deleteConfirm('Deseja APROVAR este pedido na ClearSale?', '".$approveUrl."');\"><span><span><span>Aprovar</span></span></span></button>
-								<button type=\"button\" class=\"scalable delete\" onclick=\"deleteConfirm('Deseja REPROVAR este pedido na ClearSale?', '".$disapproveUrl."');\"><span><span><span>Reprovar</span></span></span></button>
-								<button type=\"button\" class=\"scalable go\" onclick=\"deleteConfirm('Deseja enviar este pedido para REANÁLISE na ClearSale?', '".$reanalyzeUrl."');\"><span><span><span>Reanalisar</span></span></span></button>
+							<td colspan=\"2\" style=\"padding: 2px 10px 10px 10px; border-bottom: 1px solid #d6d6d6;\">";
+
+		if (in_array($status, array("AMA","NVO"))) {
+			$html .= "			<button type=\"button\" class=\"scalable save\" onclick=\"deleteConfirm('Deseja APROVAR este pedido na ClearSale?', '".$approveUrl."');\"><span><span><span>Aprovar</span></span></span></button>
+								<button type=\"button\" class=\"scalable delete\" onclick=\"deleteConfirm('Deseja REPROVAR este pedido na ClearSale?', '".$disapproveUrl."');\"><span><span><span>Reprovar</span></span></span></button>";
+		}
+
+		$html .=	"			<button type=\"button\" class=\"scalable go\" onclick=\"deleteConfirm('Deseja enviar este pedido para REANÁLISE na ClearSale?', '".$reanalyzeUrl."');\"><span><span><span>Reanalisar</span></span></span></button>
 							</td>
 						</tr>";
 
-		
+		/*
 		$commentsXml = "<AnalystComments>
 							<AnalystComments>
 								<CreateDate>2015-10-20 15:37</CreateDate>
@@ -86,6 +100,7 @@ class Cammino_Clearsale_Model_Standard {
 								<LineName></LineName>
 							</AnalystComments>
 						</AnalystComments>";
+		*/
 		
 
 		$commentsXmlObj = simplexml_load_string($commentsXml);
