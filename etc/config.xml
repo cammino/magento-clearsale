@@ -17,8 +17,51 @@
                     <sales_order_view_tab_info>Cammino_Clearsale_Block_Adminhtml_Sales_Order_View_Tab_Info</sales_order_view_tab_info>
                 </rewrite>
             </adminhtml>
+            <cammino_clearsale>
+                <class>Cammino_Clearsale_Block</class>
+            </cammino_clearsale>
         </blocks>
+        <events>
+            <sales_order_invoice_save_after>
+                <observers>
+                    <clearsale_observer_setorderasreturned>
+                        <type>singleton</type>
+                        <class>Cammino_Clearsale_Model_Observer</class>
+                        <method>setOrderAsReturned</method>
+                    </clearsale_observer_setorderasreturned>
+                </observers>
+            </sales_order_invoice_save_after>
+            <sales_order_place_after>
+                <observers>
+                    <clearsale_observer_setsessionid>
+                        <type>singleton</type>
+                        <class>Cammino_Clearsale_Model_Observer</class>
+                        <method>setSessionId</method>
+                    </clearsale_observer_setsessionid>
+                </observers>
+            </sales_order_place_after>
+        </events>
     </global>
+    <frontend>
+        <layout>
+            <updates>
+                <clearsalemapper module="Cammino_Clearsale">
+                    <file>clearsalemapper.xml</file>
+                </clearsalemapper>
+            </updates>
+        </layout> 
+    </frontend>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Cammino_Clearsale after="Mage_Adminhtml">Cammino_Clearsale_Adminhtml</Cammino_Clearsale>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
     <default>
         <payment_services>
             <clearsale_start>

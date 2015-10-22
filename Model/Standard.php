@@ -21,33 +21,120 @@ class Cammino_Clearsale_Model_Standard {
 		$payment = $order->getPayment();
 		$addata = unserialize($payment->getData("additional_data"));
 
-		// if ($addata["clearsale"] != "exported") {
-		// 	$this->sendOrder($order);
-		// 	$addata["clearsale"] = "exported";
-		// 	$payment->setAdditionalData(serialize($addata))->save();
-		// }
+		if (($addata["clearsale"] != "exported") &&
+			($addata["clearsale"] != "approved") &&
+			($addata["clearsale"] != "disapproved")) {
 
-		$xml = '<?xml version="1.0" encoding="utf-8"?><string xmlns="http://www.clearsale.com.br/integration">&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;ClearSale&gt;&lt;Orders&gt;&lt;Order&gt;&lt;ID&gt;100002620&lt;/ID&gt;&lt;Status&gt;AMA&lt;/Status&gt;&lt;Score&gt;44.8700&lt;/Score&gt;&lt;/Order&gt;&lt;/Orders&gt;&lt;/ClearSale&gt;</string>';
+			$xml = $this->sendOrder($order);
+			$addata["clearsale"] = "exported";
+			$payment->setAdditionalData(serialize($addata))->save();
+		}
 
-		//$xml = $this->getOrderStatusXml($order);
-		$xmlo = simplexml_load_string($xml);
-		var_dump($xmlo->string);
+		return $this->formatScoreTable($order);
+	}
 
-		// $xml .= $this->getAnalystCommentsXml($order);
+	public function formatScoreTable($order) {
 
+		$statusXml = $this->getOrderStatusXml($order);
+		$statusXml = $this->clearXmlResponse($statusXml);
+		$statusXmlObj = simplexml_load_string($statusXml);
+
+		$commentsXml = $this->getAnalystCommentsXml($order);
+		$commentsXml = $this->clearXmlResponse($commentsXml);
+		$commentsXmlObj = simplexml_load_string($commentsXml);
+
+		$status = strval($statusXmlObj->Orders->Order->Status);
+
+		$approveUrl = Mage::helper("adminhtml")->getUrl("/clearsale/approve", array('id' => $order->getIncrementId()));
+		$disapproveUrl = Mage::helper("adminhtml")->getUrl("/clearsale/disapprove", array('id' => $order->getIncrementId()));
+		$reanalyzeUrl = Mage::helper("adminhtml")->getUrl("/clearsale/reanalyze", array('id' => $order->getIncrementId()));
+
+		$html = 	"<table cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; border: 1px solid #d6d6d6; margin: 20px 0;\">
+						<tr>
+							<td colspan=\"2\" style=\"background:#6f8992; color:#fff; font-weight: bold; padding: 2px 10px;\">ClearSale</td>
+						</tr>
+						<tr>
+							<td style=\"padding: 10px 10px 2px 10px; width:15%;\">Status:</td>
+							<td style=\"padding: 10px 10px 2px 10px; font-weight: bold;  width:85%;\">". $this->getLiteralStatus($status) ." (". $status .")</td>
+						</tr>
+						<tr>
+							<td style=\"padding: 2px 10px 10px 10px;\">Score:</td>
+							<td style=\"padding: 2px 10px 10px 10px; font-weight: bold;\">". $statusXmlObj->Orders->Order->Score ."</td>
+						</tr>
+						<tr>
+							<td colspan=\"2\" style=\"padding: 2px 10px 10px 10px; border-bottom: 1px solid #d6d6d6;\">
+								<button type=\"button\" class=\"scalable save\" onclick=\"deleteConfirm('Deseja APROVAR este pedido na ClearSale?', '".$approveUrl."');\"><span><span><span>Aprovar</span></span></span></button>
+								<button type=\"button\" class=\"scalable delete\" onclick=\"deleteConfirm('Deseja REPROVAR este pedido na ClearSale?', '".$disapproveUrl."');\"><span><span><span>Reprovar</span></span></span></button>
+								<button type=\"button\" class=\"scalable go\" onclick=\"deleteConfirm('Deseja enviar este pedido para REANÁLISE na ClearSale?', '".$reanalyzeUrl."');\"><span><span><span>Reanalisar</span></span></span></button>
+							</td>
+						</tr>";
+
+		
+		$commentsXml = "<AnalystComments>
+							<AnalystComments>
+								<CreateDate>2015-10-20 15:37</CreateDate>
+								<Comments>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident laboriosam nemo sint, quibusdam rem reprehenderit perspiciatis atque fugiat dolores ratione quod! Quibusdam delectus, eaque qui eius voluptate iure deleniti ducimus.</Comments>
+								<UserName>marcelo</UserName>
+								<Status></Status>
+								<LineName></LineName>
+							</AnalystComments>
+							<AnalystComments>
+								<CreateDate>2015-10-20 15:37</CreateDate>
+								<Comments>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident laboriosam nemo sint, quibusdam rem reprehenderit perspiciatis atque fugiat dolores ratione quod! Quibusdam delectus, eaque qui eius voluptate iure deleniti ducimus.</Comments>
+								<UserName>marcelo</UserName>
+								<Status></Status>
+								<LineName></LineName>
+							</AnalystComments>
+						</AnalystComments>";
+		
+
+		$commentsXmlObj = simplexml_load_string($commentsXml);
+
+		if (strval($commentsXmlObj->AnalystComments) != "") {
+			foreach ($commentsXmlObj->AnalystComments as $comment) {
+				$html .= 	"<tr>
+								<td colspan=\"2\" style=\"padding: 10px 10px 10px 10px; border-bottom: 1px solid #d6d6d6;\"><strong>[". $comment->CreateDate . " @ ". $comment->UserName ."]</strong> " . $comment->Comments ."</td>
+							</tr>";
+			}
+		}
+
+		$html .= "</table>";
+
+		return $html;
+	}
+
+	public function getLiteralStatus($value) {
+		$literals = array(
+			"APA" => "Aprovação Automática",
+			"APM" => "Aprovação Manual",
+			"RPM" => "Reprovado Sem Suspeita",
+			"AMA" => "Análise manual",
+			"ERR" => "Erro",
+			"NVO" => "Novo",
+			"SUS" => "Suspensão Manual",
+			"CAN" => "Cancelado pelo Cliente",
+			"FRD" => "Fraude Confirmada",
+			"RPA" => "Reprovação Automática",
+			"RPP" => "Reprovação Por Política"
+		);
+		return $literals[$value];
+	}
+
+	public function clearXmlResponse($xml) {
+		$xml = str_replace("<?xml version=\"1.0\" encoding=\"utf-8\"?>", "", $xml);
+		$xml = str_replace("<string xmlns=\"http://www.clearsale.com.br/integration\">", "", $xml);
+		$xml = str_replace("</string>", "", $xml);
+		$xml = str_replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "", $xml);
 		return $xml;
 	}
 
-	public function getOrderXml($order) {
+	public function getOrderXml($order, $args=array()) {
 
 		$customerModel = Mage::getModel('customer/customer');
 		$customer = $customerModel->load($order->getCustomerId());
 
 		$xml  = $this->getHeaderXml();
 		$xml .= "<ID>". $order->getRealOrderId() ."</ID>";
-		$xml .= "<FingerPrint>";
-		$xml .= "	<SessionID>05f57866e6f3977d5a6f9c3ae3954051</SessionID>"; // TODO
-		$xml .= "</FingerPrint>";
 		$xml .= "<Date>". date('Y-m-d\TH:i:s', strtotime($order->getCreatedAt())) ."</Date>";
 		$xml .= "<Email>". $customer->getEmail() ."</Email>";
 		$xml .= "<B2B_B2C>B2C</B2B_B2C>"; // TODO
@@ -63,7 +150,7 @@ class Cammino_Clearsale_Model_Standard {
 		// $xml .= "<GiftMessage></GiftMessage>";
 		// $xml .= "<Obs></Obs>";
 		// $xml .= "<Status></Status>";
-		// $xml .= "<Reanalise></Reanalise>";
+		$xml .= "<Reanalise>". (isset($args["Reanalise"]) ? $args["Reanalise"] : "0") ."</Reanalise>";
 		$xml .= "<Origin>Magento</Origin>";
 		// $xml .= "<ReservationDate></ReservationDate>";
 		// $xml .= "<Country></Country>";
@@ -75,6 +162,7 @@ class Cammino_Clearsale_Model_Standard {
 		$xml .= $this->getShippingXml($order, $customer);
 		$xml .= $this->getPaymentXml($order);
 		$xml .= $this->getFooterXml();
+
 		return $xml;
 	}
 
@@ -162,8 +250,12 @@ class Cammino_Clearsale_Model_Standard {
 
 		$payment = $order->getPayment();
 		$paymentTypeId = $this->getPaymentTypeId($payment);
+		$addata = unserialize($payment->getData("additional_data"));
 
-		$xml  = "<Payments>";
+		$xml .= "<FingerPrint>";
+		$xml .= "	<SessionID>". $addata["clearsale_sessionid"] ."</SessionID>";
+		$xml .= "</FingerPrint>";
+		$xml .= "<Payments>";
 		$xml .= "	<Payment>";
 		// $xml .= "		<Sequential></Sequential>";
 		$xml .= "		<Date>". date('Y-m-d\TH:i:s', strtotime($order->getCreatedAt())) ."</Date>";
@@ -264,19 +356,19 @@ class Cammino_Clearsale_Model_Standard {
 
 	public function getBaseUrl() {
 		if (Mage::getStoreConfig("payment_services/clearsale_standard/environment") == 'homolog'){
-			$url = 'http://homologacao.clearsale.com.br/integracaov2/Service.asmx';
+			$url = 'http://homologacao.clearsale.com.br/integracaov2/';
 		} else {
-    		$url = 'https://integracao.clearsale.com.br/service.asmx';
+    		$url = 'https://integracao.clearsale.com.br/';
 		}
 
     	return $url;
 	}
 
-	public function sendOrder($order)
+	public function sendOrder($order, $args=array())
 	{
 		$entityCode = Mage::getStoreConfig("payment_services/clearsale_standard/entity_code");
-		$url = $this->getBaseUrl() . "/SendOrders";
-		$xml = $this->getOrderXml($order);
+		$url = $this->getBaseUrl() . "Service.asmx/SendOrders";
+		$xml = $this->getOrderXml($order, $args);
 		$data = "entityCode=" . urlencode($entityCode) . "&xml=" . urlencode($xml);
 		return html_entity_decode($this->postData($url, $data));
 	}
@@ -284,7 +376,7 @@ class Cammino_Clearsale_Model_Standard {
 	public function getOrderStatusXml($order)
 	{
 		$entityCode = Mage::getStoreConfig("payment_services/clearsale_standard/entity_code");
-		$url = $this->getBaseUrl() . "/GetOrderStatus";
+		$url = $this->getBaseUrl() . "Service.asmx/GetOrderStatus";
 		$data = "entityCode=" . urlencode($entityCode) . "&orderID=" . urlencode($order->getRealOrderId());
 		return html_entity_decode($this->postData($url, $data));
 	}
@@ -292,9 +384,61 @@ class Cammino_Clearsale_Model_Standard {
 	public function getAnalystCommentsXml($order)
 	{
 		$entityCode = Mage::getStoreConfig("payment_services/clearsale_standard/entity_code");
-		$url = $this->getBaseUrl() . "/GetAnalystComments";
+		$url = $this->getBaseUrl() . "Service.asmx/GetAnalystComments";
 		$data = "entityCode=" . urlencode($entityCode) . "&orderID=" . urlencode($order->getRealOrderId()) . "&getAll=True";
 		return html_entity_decode($this->postData($url, $data));
+	}
+
+	public function setOrderAsReturned($order)
+	{
+		$entityCode = Mage::getStoreConfig("payment_services/clearsale_standard/entity_code");
+		$url = $this->getBaseUrl() . "Service.asmx/SetOrderAsReturned";
+		$data = "entityCode=" . urlencode($entityCode) . "&orderID=" . urlencode($order->getRealOrderId());
+		return html_entity_decode($this->postData($url, $data));
+	}
+
+	public function updateOrderStatus($order, $status)
+	{
+		$entityCode = Mage::getStoreConfig("payment_services/clearsale_standard/entity_code");
+		$url = $this->getBaseUrl() . "ExtendedService.asmx/SetOrderAsReturned";
+		$data = "entityCode=" . urlencode($entityCode) . "&orderId=" . urlencode($order->getRealOrderId()) . "&newStatusId=" . $status . "&obs=";
+		return html_entity_decode($this->postData($url, $data));
+	}
+
+	public function approveOrder($order)
+	{
+		$xml = $this->updateOrderStatus($order, "26");
+		$this->updateFlag($order, "approved");
+		return $xml;
+	}
+
+	public function disapproveOrder($order)
+	{
+		$xml = $this->updateOrderStatus($order, "27");
+		$this->updateFlag($order, "disapproved");
+		return $xml;
+	}
+
+	public function reanalyzeOrder($order)
+	{
+		$xml = $this->sendOrder($order, array("Reanalise" => 1));
+		$this->updateFlag($order, "exported");
+	}
+
+	public function updateFlag($order, $value)
+	{
+		$payment = $order->getPayment();
+		$addata = unserialize($payment->getData("additional_data"));
+		$addata["clearsale"] = $value;
+		$payment->setAdditionalData(serialize($addata))->save();
+	}
+
+	public function setSessionId($order, $sessionId)
+	{
+		$payment = $order->getPayment();
+		$addata = unserialize($payment->getData("additional_data"));
+		$addata["clearsale_sessionid"] = $sessionId;
+		$payment->setAdditionalData(serialize($addata))->save();
 	}
 
 	public function postData($url, $data)
