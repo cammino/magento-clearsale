@@ -269,6 +269,7 @@ class Cammino_Clearsale_Model_Standard {
 
 		$xml .= "<FingerPrint>";
 		$xml .= "	<SessionID>". $addata["clearsale_sessionid"] ."</SessionID>";
+		// $xml .= "     <SessionID>". hash(rand(0, getrandmax())) ."</SessionID>";
 		$xml .= "</FingerPrint>";
 		$xml .= "<Payments>";
 		$xml .= "	<Payment>";
@@ -471,6 +472,8 @@ class Cammino_Clearsale_Model_Standard {
 	    
 	    $returnString = curl_exec($ch);
 	    curl_close($ch);
+
+	    Mage::log($returnString, null, 'clearsale.log');
 
 	    return $returnString;
 	}
