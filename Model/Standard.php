@@ -157,7 +157,7 @@ class Cammino_Clearsale_Model_Standard {
 		$xml .= "<TotalItems>". number_format(floatval($order->getSubtotal()), 4, ".", "") ."</TotalItems>";
 		$xml .= "<TotalOrder>". number_format(floatval($order->getGrandTotal()), 4, ".", "") ."</TotalOrder>";
 		$xml .= "<QtyInstallments>1</QtyInstallments>"; // TODO
-		// $xml .= "<DeliveryTimeCD></DeliveryTimeCD>";
+		$xml .= "<DeliveryTimeCD>". $order->getShippingDescription() ."</DeliveryTimeCD>";
 		$xml .= "<QtyItems>". intval($order->getTotalQtyOrdered()) ."</QtyItems>";
 		// $xml .= "<QtyPaymentTypes></QtyPaymentTypes>";
 		$xml .= "<IP>". $order->getRemoteIp() ."</IP>";
@@ -176,6 +176,7 @@ class Cammino_Clearsale_Model_Standard {
 		$xml .= $this->getBillingXml($order, $customer);
 		$xml .= $this->getShippingXml($order, $customer);
 		$xml .= $this->getPaymentXml($order);
+		$xml .= $this->getItemsXml($order);
 		$xml .= $this->getFooterXml();
 
 		return $xml;
