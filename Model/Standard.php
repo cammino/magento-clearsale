@@ -81,27 +81,7 @@ class Cammino_Clearsale_Model_Standard {
 
 		$html .=	"			<button type=\"button\" class=\"scalable go\" onclick=\"deleteConfirm('Deseja enviar este pedido para REANÁLISE na ClearSale?', '".$reanalyzeUrl."');\"><span><span><span>Reanalisar</span></span></span></button>
 							</td>
-						</tr>";
-
-		/*
-		$commentsXml = "<AnalystComments>
-							<AnalystComments>
-								<CreateDate>2015-10-20 15:37</CreateDate>
-								<Comments>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident laboriosam nemo sint, quibusdam rem reprehenderit perspiciatis atque fugiat dolores ratione quod! Quibusdam delectus, eaque qui eius voluptate iure deleniti ducimus.</Comments>
-								<UserName>marcelo</UserName>
-								<Status></Status>
-								<LineName></LineName>
-							</AnalystComments>
-							<AnalystComments>
-								<CreateDate>2015-10-20 15:37</CreateDate>
-								<Comments>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident laboriosam nemo sint, quibusdam rem reprehenderit perspiciatis atque fugiat dolores ratione quod! Quibusdam delectus, eaque qui eius voluptate iure deleniti ducimus.</Comments>
-								<UserName>marcelo</UserName>
-								<Status></Status>
-								<LineName></LineName>
-							</AnalystComments>
-						</AnalystComments>";
-		*/
-		
+						</tr>";	
 
 		$commentsXmlObj = simplexml_load_string($commentsXml);
 
@@ -188,6 +168,7 @@ class Cammino_Clearsale_Model_Standard {
 		$billingName = $billingAddress->getFirstname() . " " . $billingAddress->getMiddlename() . " " . $billingAddress->getLastname();
 		$billingName = trim(str_replace("  ", " ", $billingName));
 		$billingPhone = preg_replace('/[^0-9]/', '', $billingAddress->getTelephone());
+		$customerGender = $this->getCustomerGender($customer);
 
 		$xml  = "<BillingData>";
 		$xml .= "	<ID>". $order->getCustomerId() ."</ID>";
@@ -195,9 +176,17 @@ class Cammino_Clearsale_Model_Standard {
 		$xml .= "	<LegalDocument1>". preg_replace('/[^0-9]/', '', $customer->getTaxvat()) ."</LegalDocument1>";
 		// $xml .= "	<LegalDocument2></LegalDocument2>";
 		$xml .= "	<Name>". $billingName ."</Name>";
-		// $xml .= "	<BirthDate></BirthDate>";
+
+		if ($customer->getDob() != null) {
+			$xml .= "	<BirthDate>". date('Y-m-d\TH:i:s', strtotime($customer->getDob())) ."</BirthDate>";
+		}
+
 		$xml .= "	<Email>". $customer->getEmail() ."</Email>";
-		// $xml .= "	<Gender></Gender>";
+
+		if ($customerGender != "") {
+			$xml .= "	<Gender>". $customerGender ."</Gender>";
+		}
+
 		$xml .= "	<Address>";
 		$xml .= "		<Street>". $billingAddress->getStreet(1) ."</Street>";
 		$xml .= "		<Number>". $billingAddress->getStreet(2) ."</Number>";
@@ -220,6 +209,18 @@ class Cammino_Clearsale_Model_Standard {
 		$xml .= "	</Phones>";
 		$xml .= "</BillingData>";
 		return $xml;
+	}
+
+	public function getCustomerGender($customer) {
+		$customerGender = Mage::getResourceSingleton('customer/customer')->getAttribute('gender')->getSource()->getOptionText($customer->getGender());
+		if (($customerGender == "Masculino") || ($customerGender == "Male")) {
+			return "M";
+		} else if(($customerGender == "Feminino") || ($customerGender == "Female")) {
+			return "F";
+		} else {
+			return "";
+		}
+		return "";
 	}
 
 	public function getShippingXml($order, $customer) {
@@ -387,6 +388,9 @@ class Cammino_Clearsale_Model_Standard {
 		$url = $this->getBaseUrl() . "Service.asmx/SendOrders";
 		$xml = $this->getOrderXml($order, $args);
 		$data = "entityCode=" . urlencode($entityCode) . "&xml=" . urlencode($xml);
+
+		Mage::log($xml, null, 'clearsale.log');
+
 		return html_entity_decode($this->postData($url, $data));
 	}
 

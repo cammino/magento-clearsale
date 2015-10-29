@@ -25,8 +25,8 @@ class Cammino_Clearsale_Block_Adminhtml_Sales_Order_View_Tab_Info extends Mage_A
 
 		$html = parent::getPaymentHtml();
 
-		if ($order->getState() != "canceled")
-		{
+		// if ($order->getState() != "canceled")
+		// {
 			if (intval(Mage::getStoreConfig("payment_services/clearsale_start/active")) == 1) {
 				$clearsale = Mage::getModel('cammino_clearsale/start');	
 				$url = $clearsale->getScoreUrl($order);
@@ -36,7 +36,7 @@ class Cammino_Clearsale_Block_Adminhtml_Sales_Order_View_Tab_Info extends Mage_A
 				$clearsale = Mage::getModel('cammino_clearsale/standard');	
 				$html .= $clearsale->getScoreTable($order);
 			}
-		}
+		// }
 
 		return $html;
 	}
