@@ -17,7 +17,8 @@ class Cammino_Clearsale_Model_Observer extends Varien_Object
 		try {
 			$event = $observer->getEvent();
 			$order = $event->getOrder();
-			$sessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
+			$sessionId = Mage::getSingleton('core/session')->getClearSaleSessionId();
+		//	$sessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
 			$clearsale = Mage::getModel('cammino_clearsale/standard');
 			$clearsale->setSessionId($order, $sessionId);
 		} catch(Exception $ex) {
