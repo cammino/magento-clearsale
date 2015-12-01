@@ -81,7 +81,7 @@ class Cammino_Clearsale_Model_Standard {
 
 		$html .=	"			<button type=\"button\" class=\"scalable go\" onclick=\"deleteConfirm('Deseja enviar este pedido para REANÁLISE na ClearSale?', '".$reanalyzeUrl."');\"><span><span><span>Reanalisar</span></span></span></button>
 							</td>
-						</tr>";	
+						</tr>";
 
 		$commentsXmlObj = simplexml_load_string($commentsXml);
 
@@ -321,6 +321,14 @@ class Cammino_Clearsale_Model_Standard {
 		}
 	}
 
+	public function isIgnoredMethod($payment){
+		$ignoreMethods = explode(",", Mage::getStoreConfig("payment_services/clearsale_standard/ignoremethods"));
+		if(in_array($payment,$ignoreMethods))
+			return true;
+		else
+			return false;
+	}
+
 	public function getPaymentCardType($payment) {
 		$paymentCardType = 4;
 		$paymentData = $payment->getData("additional_data");
@@ -465,7 +473,7 @@ class Cammino_Clearsale_Model_Standard {
 	public function postData($url, $data)
 	{
 	    $ch = curl_init();
-	    
+
 	    curl_setopt($ch, CURLOPT_POST, 1);
 	    curl_setopt($ch, CURLOPT_POSTFIELDS,  $data);
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -474,7 +482,7 @@ class Cammino_Clearsale_Model_Standard {
 	    curl_setopt($ch, CURLOPT_FAILONERROR, true);
 	    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
 	    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-	    
+
 	    $returnString = curl_exec($ch);
 	    curl_close($ch);
 

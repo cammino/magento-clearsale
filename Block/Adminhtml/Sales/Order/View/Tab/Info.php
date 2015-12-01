@@ -28,13 +28,19 @@ class Cammino_Clearsale_Block_Adminhtml_Sales_Order_View_Tab_Info extends Mage_A
 		if ($order->getState() != "canceled")
 		{
 			if (intval(Mage::getStoreConfig("payment_services/clearsale_start/active")) == 1) {
-				$clearsale = Mage::getModel('cammino_clearsale/start');	
+				$clearsale = Mage::getModel('cammino_clearsale/start');
 				$url = $clearsale->getScoreUrl($order);
 				$html .= "<div style=\"margin-left:-8px;\"><iframe style=\"width:277px;height:96px;border:none;\" src=\"". $url ."\"></iframe></div>";
 			}
 			if (intval(Mage::getStoreConfig("payment_services/clearsale_standard/active")) == 1) {
-				$clearsale = Mage::getModel('cammino_clearsale/standard');	
-				$html .= $clearsale->getScoreTable($order);
+				$payment = $order->getPayment();
+				$paymentMethod = $payment->getMethodInstance()->getCode();
+
+				$clearsale = Mage::getModel('cammino_clearsale/standard');
+
+				if(!$clearsale->isIgnoredMethod($paymentMethod)){
+					$html .= $clearsale->getScoreTable($order);
+				}
 			}
 		}
 
