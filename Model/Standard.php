@@ -144,7 +144,7 @@ class Cammino_Clearsale_Model_Standard {
 		// $xml .= "<Gift></Gift>";
 		// $xml .= "<GiftMessage></GiftMessage>";
 		// $xml .= "<Obs></Obs>";
-		// $xml .= "<Status></Status>";
+		$xml .= "<Status>". $this->getStatusId($order) ."</Status>";
 		$xml .= "<Reanalise>". (isset($args["Reanalise"]) ? $args["Reanalise"] : "0") ."</Reanalise>";
 		$xml .= "<Origin>Magento</Origin>";
 		// $xml .= "<ReservationDate></ReservationDate>";
@@ -321,9 +321,25 @@ class Cammino_Clearsale_Model_Standard {
 		}
 	}
 
+	public function getStatusId($order) {
+		if ($order->getStatus() == "canceled") {
+			return 41;
+		} else {
+			return 0;
+		}
+	}
+
 	public function isIgnoredMethod($payment){
 		$ignoreMethods = explode(",", Mage::getStoreConfig("payment_services/clearsale_standard/ignoremethods"));
 		if(in_array($payment,$ignoreMethods))
+			return true;
+		else
+			return false;
+	}
+
+	public function isIgnoredStatus($status){
+		$ignoreStatus = explode(",", Mage::getStoreConfig("payment_services/clearsale_standard/ignorestatus"));
+		if(in_array($status,$ignoreStatus))
 			return true;
 		else
 			return false;
