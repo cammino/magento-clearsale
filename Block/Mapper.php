@@ -5,7 +5,9 @@ class Cammino_Clearsale_Block_Mapper extends Mage_Core_Block_Template {
 
 		$sessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
 		$clearSaleSessionId = Mage::getSingleton('core/session')->getClearSaleSessionId();
-
+        $path   = Mage::app()->getRequest()->getOriginalPathInfo();
+        $script = "";
+        
 		if (($clearSaleSessionId == null) || !isset($clearSaleSessionId) || (strval($clearSaleSessionId) == "")) {
 			Mage::getSingleton('core/session')->setClearSaleSessionId($sessionId);
 			$clearSaleSessionId = $sessionId;
