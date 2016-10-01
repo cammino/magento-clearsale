@@ -5,3 +5,4 @@ git submodule add git@github.com:mferracioli/magento-clearsale.git app/code/comm
 cp app/code/community/Cammino/Clearsale/Cammino_Clearsale.xml app/etc/modules/
 
 TODO
+.
