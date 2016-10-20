@@ -6,7 +6,9 @@ class Cammino_Clearsale_Model_Observer_CronInvoice extends Varien_Object
 {
     public function createInvoice()
     {
-        $this->verifyClearSaleStatus();
+        if ($this->getEnableAutomaticInvoice()) {
+            $this->verifyClearSaleStatus();
+        }
     }
 
 
