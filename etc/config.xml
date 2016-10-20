@@ -26,7 +26,7 @@
                 <observers>
                     <clearsale_observer_setorderasreturned>
                         <type>singleton</type>
-                        <class>Cammino_Clearsale_Model_Observer</class>
+                        <class>Cammino_Clearsale_Model_Observer_Status</class>
                         <method>setOrderAsReturned</method>
                     </clearsale_observer_setorderasreturned>
                 </observers>
@@ -35,13 +35,25 @@
                 <observers>
                     <clearsale_observer_setsessionid>
                         <type>singleton</type>
-                        <class>Cammino_Clearsale_Model_Observer</class>
+                        <class>Cammino_Clearsale_Model_Observer_Status</class>
                         <method>setSessionId</method>
                     </clearsale_observer_setsessionid>
                 </observers>
             </sales_order_place_after>
         </events>
     </global>
+
+    <crontab>
+        <jobs>
+            <cammino_clearsale_automatic_invoice_cron>
+                <schedule>
+                    <cron_expr>30 * * * *</cron_expr>
+                </schedule>
+                <run><model>cammino_clearsale/observer_cronInvoice::createInvoice</model></run>
+            </cammino_clearsale_automatic_invoice_cron>
+        </jobs>
+    </crontab>
+
     <frontend>
         <layout>
             <updates>

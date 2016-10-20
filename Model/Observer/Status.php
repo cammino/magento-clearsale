@@ -1,5 +1,5 @@
 <?php 
-class Cammino_Clearsale_Model_Observer extends Varien_Object
+class Cammino_Clearsale_Model_Observer_Status extends Varien_Object
 {
 	public function setOrderAsReturned(Varien_Event_Observer $observer)
 	{
@@ -21,7 +21,6 @@ class Cammino_Clearsale_Model_Observer extends Varien_Object
 		//	$sessionId = Mage::getSingleton("core/session")->getEncryptedSessionId();
 			$clearsale = Mage::getModel('cammino_clearsale/standard');
 			$clearsale->setSessionId($order, $sessionId);
-		} catch(Exception $ex) {
-		}
+		} catch(Exception $ex) { }
 	}
 }
