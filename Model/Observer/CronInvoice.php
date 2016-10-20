@@ -82,7 +82,7 @@ class Cammino_Clearsale_Model_Observer_CronInvoice extends Varien_Object
         $query = "SELECT `sales_flat_order`.`entity_id`,  `sales_flat_order_payment`.`method`, `sales_flat_order_payment`.`additional_data` FROM `sales_flat_order`
                   LEFT JOIN `sales_flat_order_payment` ON `sales_flat_order`.`entity_id` = `sales_flat_order_payment`.`parent_id`
                   LEFT JOIN `sales_flat_invoice` ON `sales_flat_invoice`.`order_id` = `sales_flat_order`.`entity_id`
-                  WHERE `sales_flat_order`.`status` = 'pending_payment' {$methodsQuery} AND `sales_flat_order`.`created_at` >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND `sales_flat_invoice`.`entity_id` IS NULL";
+                  WHERE `sales_flat_order`.`status` = 'pending_payment' {$methodsQuery} AND `sales_flat_order`.`created_at` >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND `sales_flat_invoice`.`entity_id` IS NULL";
         
         /**
          * Execute the query and store the results in $results
