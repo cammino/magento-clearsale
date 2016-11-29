@@ -174,18 +174,21 @@ class Cammino_Clearsale_Model_Observer_CronInvoice extends Varien_Object
             
             try {
                 // send email to customer.
-                $invoice->sendEmail(1, '');    
-            } catch (Exception $e) {}
+                $invoice->sendEmail(true, '');
+                Mage::log('1. mandou email.', null, 'clearsalecron.log');
+
+            } catch (Exception $e) {
+                Mage::log('1.2. ocorreu erro ao mandar o email.', null, 'clearsalecron.log');
+            }
             
             
             /**
              * save order with invoice.
              **/
             $order->save();
-            $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);      
-           
+            Mage::log('2. salvou o status do pedido.', null, 'clearsalecron.log');
         } 
-       catch (Exception $e) {
+        catch (Exception $e) {
             // $order->addStatusHistoryComment('Cron Invoicer1: Exception occurred during automaticallyInvoiceShipCompleteOrder action. Exception message: '.$e->getMessage(), false);
             return false;
         }
