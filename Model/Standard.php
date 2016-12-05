@@ -175,7 +175,7 @@ class Cammino_Clearsale_Model_Standard {
 		$xml .= "	<Type>1</Type>"; // TODO
 		$xml .= "	<LegalDocument1>". preg_replace('/[^0-9]/', '', $customer->getTaxvat()) ."</LegalDocument1>";
 		// $xml .= "	<LegalDocument2></LegalDocument2>";
-		$xml .= "	<Name>". $billingName ."</Name>";
+		$xml .= "	<Name>". $this->clearString($billingName) ."</Name>";
 
 		if ($customer->getDob() != null) {
 			$xml .= "	<BirthDate>". date('Y-m-d\TH:i:s', strtotime($customer->getDob())) ."</BirthDate>";
@@ -188,11 +188,11 @@ class Cammino_Clearsale_Model_Standard {
 		}
 
 		$xml .= "	<Address>";
-		$xml .= "		<Street>". $billingAddress->getStreet(1) ."</Street>";
-		$xml .= "		<Number>". $billingAddress->getStreet(2) ."</Number>";
-		$xml .= "		<Comp>". $billingAddress->getStreet(4) ."</Comp>";
+		$xml .= "		<Street>". $this->clearString($billingAddress->getStreet(1)) ."</Street>";
+		$xml .= "		<Number>". $this->clearString($billingAddress->getStreet(2)) ."</Number>";
+		$xml .= "		<Comp>". $this->clearString($billingAddress->getStreet(4)) ."</Comp>";
 		$xml .= "		<County>". $billingAddress->getStreet(3) ."</County>";
-		$xml .= "		<City>". $billingAddress->getCity() ."</City>";
+		$xml .= "		<City>". $this->clearString($billingAddress->getCity()) ."</City>";
 		$xml .= "		<State>". $billingAddress->getRegionCode() ."</State>";
 		$xml .= "		<ZipCode>". preg_replace('/[^0-9]/', '', $billingAddress->getPostcode()) ."</ZipCode>";
 		// $xml .= "		<Reference></Reference>";
@@ -375,7 +375,7 @@ class Cammino_Clearsale_Model_Standard {
 		foreach ($items as $item) {
 			$xml .= "	<Item>";
 			$xml .= "		<ID>". $item->getSku() ."</ID>";
-			$xml .= "		<Name>". $item->getName() ."</Name>";
+			$xml .= "		<Name>". $this->clearString($item->getName()) ."</Name>";
 			$xml .= "		<ItemValue>". number_format(floatval($item->getPrice()), 2, ".", "") ."</ItemValue>";
 			$xml .= "		<Qty>". intval($item->getQtyOrdered()) ."</Qty>";
 			// $xml .= "		<Gift></Gift>";
@@ -505,6 +505,11 @@ class Cammino_Clearsale_Model_Standard {
 	    Mage::log($returnString, null, 'clearsale.log');
 
 	    return $returnString;
+	}
+
+	private function clearString($str) {
+		$str = str_replace('&', 'e', $str);
+		return $str;
 	}
 
 }
